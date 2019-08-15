@@ -109,6 +109,21 @@ var (
 				return parseCommaSeperatedInt(fields, deviceFields, strings.TrimSuffix(str, "%"))
 			},
 		},
+    "Data Units Written": {
+      Name: "Data_Units_Written",
+      Parse: func(fields, deviceFields map[string]interface{}, str string) error {
+        return parseNvmeDataUnits(fields, deviceFields, str)
+      },
+    },
+    "Data Units Read": {
+      Name: "Data_Units_Read",
+      Parse: func(fields, deviceFields map[string]interface{}, str string) error {
+        return parseNvmeDataUnits(fields, deviceFields, str)
+      },
+    },
+    "Controller Busy Time": {
+      Name: "Controller_Busy_Time",
+    },
 	}
 )
 
@@ -424,6 +439,17 @@ func parseInt(str string) int64 {
 
 func parseCommaSeperatedInt(fields, _ map[string]interface{}, str string) error {
 	i, err := strconv.ParseInt(strings.Replace(str, ",", "", -1), 10, 64)
+	if err != nil {
+		return err
+	}
+
+	fields["raw_value"] = i
+
+	return nil
+}
+
+func parseNvmeDataUnits(fields, _ map[string]interface{}, str string) error {
+	i, err := strconv.ParseInt(strings.Replace(strings.Split(str, " [")[0], ",", "", -1) , 10, 64)
 	if err != nil {
 		return err
 	}
